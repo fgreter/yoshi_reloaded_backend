@@ -6,11 +6,14 @@ COPY gradle gradle
 COPY build.gradle .
 COPY src src
 
-RUN ./gradlew build
-RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
+RUN ./gradlew build -x test
+RUN mkdir -p build/libs/dependency && (cd build/libs/dependency; jar -xf ../*.jar)
 
 
 FROM openjdk:13-alpine
 VOLUME /tmp
-COPY build/libs/*.jar app.jar
-ENTRYPOINT ["java","-jar","/app.jar"]
+ARG DEPENDENCY=/workspace/app/build/libs/dependency
+COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
+COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
+COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
+ENTRYPOINT ["java","-cp","app:app/lib/*","ch.uzh.ifi.seal.yoshi.YoshiApplication"]
