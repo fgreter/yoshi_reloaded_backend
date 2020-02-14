@@ -1,12 +1,10 @@
-FROM openjdk:13-alpine as build
+FROM gradle:6.1.1-jdk13 as build
 WORKDIR /workspace/app
 
-COPY gradlew .
-COPY gradle gradle
 COPY build.gradle .
 COPY src src
 
-RUN ./gradlew build -x test
+RUN gradle build -x test
 RUN mkdir -p build/libs/dependency && (cd build/libs/dependency; jar -xf ../*.jar)
 
 
