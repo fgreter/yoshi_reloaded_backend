@@ -16,7 +16,7 @@ public class Community implements Serializable {
     @Column
     private String name;
 
-    public Community() {
+    public Community(Long id) {
         // Empty constructor needed for database purposes
     }
 
